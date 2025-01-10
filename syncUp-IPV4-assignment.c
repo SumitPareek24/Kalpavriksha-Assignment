@@ -48,6 +48,44 @@ int convertNumber(char *str)
     return number;
 }
 
+void checkValidationSpaceDot(int lengthOfString, char *str, int *check, int wordCount)
+{
+    for (int i = 0; i < lengthOfString - 1; i++)
+    {
+        if (str[i] == '.' && str[i + 1] == '.')
+        {
+            * check = 0;
+            break;
+        }
+        else if (str[i] == ' ')
+        {
+            * check = 0;
+            break;
+        }
+    }
+
+    for (int i = 0; i < wordCount; i++)
+    {
+        if (arr[i][0] == '0' && stringLength(arr[i]) > 1)
+        {
+            * check = 0;
+            break;
+        }
+    }
+}
+
+void chekValidationNumbers(int * check, int wordCount) {
+    for (int i = 0; i < wordCount; i++)
+    {
+        int n = convertNumber(arr[i]);
+        if (n < 0 || n > 255)
+        {
+            * check = 0;
+            break;
+        }
+    }
+}
+
 int main()
 {
 
@@ -65,39 +103,11 @@ int main()
 
     int check = 1;
 
-    for (int i = 0; i < lengthOfString - 1; i++)
-    {
-        if (str[i] == '.' && str[i + 1] == '.')
-        {
-            check = 0;
-            break;
-        }
-        else if (str[i] == ' ')
-        {
-            check = 0;
-            break;
-        }
-    }
-
     int wordCount = splitWords(str);
 
-    for (int i = 0; i < wordCount; i++)
-    {
-        if(arr[i][0] == '0' && stringLength(arr[i]) > 1) {
-            check = 0;
-            break;
-        }
-    }
+    checkValidationSpaceDot(lengthOfString, str, &check, wordCount);
 
-    for (int i = 0; i < wordCount; i++)
-    {
-        int n = convertNumber(arr[i]);
-        if (n < 0 || n > 255)
-        {
-            check = 0;
-            break;
-        }
-    }
+    chekValidationNumbers(&check, wordCount);
 
     check ? printf("Valid\n") : printf("Invalid\n");
 
