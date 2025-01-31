@@ -1,126 +1,140 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-struct Node {
-    char str[10];
+struct Node
+{
+    char *str;
     int data;
-    struct Node * next;
+    struct Node *next;
 };
 
-int checkDuplicate(struct Node * head, int currentId) {
-    while(head != NULL) {
-        if(currentId == head -> data) {
-            return 1;
-        }
-    }
-    return 0;
-}
-
-int checkPriority(struct Node * head) {
-    if(head -> str == "Critical") {
+int checkPriority(struct Node *head)
+{
+    if (strcmp(head->str, "Critical") == 0)
+    {
         return 3;
-    } else if(head -> str == "Serious") {
+    }
+    else if (strcmp(head->str, "Serious") == 0)
+    {
         return 2;
-    } else {
+    }
+    else
+    {
         return 1;
     }
 }
 
-void takeInput(int noOfPatients, struct Node * head, struct Node * current) {    
+void takeInput(int noOfPatients, struct Node **head, struct Node *current)
+{
 
-    struct Node * seriousHead = NULL, * criticalHead = NULL, * stableHead = NULL;
-    struct Node * seriousEnd = NULL, * criticalEnd = NULL, * stableEnd = NULL;
+    struct Node *seriousHead = NULL, *criticalHead = NULL, *stableHead = NULL;
+    struct Node *seriousEnd = NULL, *criticalEnd = NULL, *stableEnd = NULL;
 
     printf("No of patients: %d\n", noOfPatients);
     printf("Enter id & status: \n");
-    while(noOfPatients--) {
-        char status[10];
+    while (noOfPatients--)
+    {
+        char *status = (char *)malloc(10 * sizeof(char));
         int number;
 
         scanf("%d", &number);
 
-        if(checkDuplicate(head, number)) {
-            printf("id already exist\n");
-            continue;
-        }
-
         scanf("%s", status);
-        struct Node * newNode = (struct Node *)malloc(sizeof(struct Node));
-        // newNode -> str = (char *)malloc(sizeof(char));
-        newNode -> str = status;
-        newNode -> data = number;
-        newNode -> next = NULL;
+        struct Node *newNode = (struct Node *)malloc(sizeof(struct Node));
+        newNode->str = status;
+        newNode->data = number;
+        newNode->next = NULL;
 
-        if(checkPriority(newNode) == 3) {
-            if(criticalHead == NULL) {
+        if (checkPriority(newNode) == 3)
+        {
+            if (criticalHead == NULL)
+            {
                 criticalHead = newNode;
+                criticalEnd = newNode;
             }
-            criticalEnd = newNode;
-            criticalEnd = criticalEnd -> next;
-        } else if(checkPriority(newNode) == 2) {
-            if(seriousHead == NULL) {
+            else
+            {
+                criticalEnd->next = newNode;
+                criticalEnd = newNode;
+            }
+        }
+        else if (checkPriority(newNode) == 2)
+        {
+            if (seriousHead == NULL)
+            {
                 seriousHead = newNode;
+                seriousEnd = newNode;
             }
-            seriousEnd = newNode;
-            seriousEnd = seriousEnd -> next;
-        } else {
-            if(stableHead == NULL) {
+            else
+            {
+                seriousEnd->next = newNode;
+                seriousEnd = newNode;
+            }
+        }
+        else if (checkPriority(newNode) == 1)
+        {
+            if (stableHead == NULL)
+            {
                 stableHead = newNode;
+                stableEnd = newNode;
             }
-            stableEnd = newNode;
-            stableEnd = stableEnd -> next;
+            else
+            {
+                stableEnd->next = newNode;
+                stableEnd = newNode;
+            }
         }
+    }
 
-        if(head == NULL) {
-            head = newNode;
-            current = newNode;
-        } else {
-            current -> next = newNode;
-            // current = current -> next;
+    if (criticalHead != NULL)
+    {
+        *head = criticalHead;
+        if (seriousHead != NULL)
+        {
+            criticalEnd->next = seriousHead;
+            if (stableHead != NULL)
+            {
+                seriousEnd->next = stableHead;
+            }
         }
-        printf("cur: %d\n", current -> data);
-        current = current -> next;
+        else if (stableHead != NULL)
+        {
+            criticalEnd->next = stableHead;
+        }
+    }
+    else if (seriousHead != NULL)
+    {
+        *head = seriousHead;
+        if (stableHead != NULL) {
+            seriousEnd->next = stableHead;
+        }
+    }
+    else
+    {
+        *head = stableHead;
     }
 
-
-    printf("cri: %d\n", criticalHead -> data);
-    printf("seri: %d\n", seriousHead -> data);
-    printf("stab: %d\n", stableHead -> data);
+    // stableEnd = NULL;
 }
 
-struct Node * findMiddle(struct Node * head) {
-    struct Node * slow = head, * fast = head -> next;
-    while(fast != NULL && fast -> next != NULL) {
-        slow = slow -> next;
-        fast = fast -> next -> next;
-    }
-    return slow;
-}
+int main()
+{
 
-void merge(struct Node * head) {
-
-}
-
-struct Node * mergeSort(struct Node * head, struct Node * left, struct Node * right) {
-    if(head == NULL || head -> next == NULL) {
-        return  head;
-    }
-
-    struct Node * middle = findMiddle(head);
-
-}
-
-void bubbleSort() {
-
-}
-
-int main() {
-
-    struct Node * head = NULL, * current = NULL;
+    struct Node *head = NULL, *current = NULL;
     int noOfPatients;
     printf("Enter no of patients: ");
     scanf("%d", &noOfPatients);
-    takeInput(noOfPatients, head, current);
+    takeInput(noOfPatients, &head, current);
+
+    printf("Sorted data:\n");
+    while (head != NULL)
+    {
+        printf("%d ", head->data);
+        printf("%s ", head->str);
+        printf("\n");
+        head = head->next;
+    }
 
     return 0;
 }
